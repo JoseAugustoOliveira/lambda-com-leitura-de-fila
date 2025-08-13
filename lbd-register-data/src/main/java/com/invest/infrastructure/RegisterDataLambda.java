@@ -8,21 +8,24 @@ import com.invest.exceptions.BusinessValidationException;
 import com.invest.models.OutputObject;
 import com.invest.models.responses.MovementSqsResponse;
 import com.invest.services.MovementService;
+import com.invest.services.SnsPublisherService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
 @Named("lbd-register-data")
+@RequiredArgsConstructor
 public class RegisterDataLambda implements RequestHandler<SQSEvent, OutputObject> {
 
     @Inject
     ObjectMapper objectMapper;
 
-    @Inject
-    MovementService movementService;
+    private final MovementService movementService;
+    private final SnsPublisherService snsPublisherService;
 
     @Override
     public OutputObject handleRequest(SQSEvent sqsEvent, Context context) {
@@ -41,6 +44,8 @@ public class RegisterDataLambda implements RequestHandler<SQSEvent, OutputObject
             log.info("Processing message body: {}", body);
             MovementSqsResponse movement = objectMapper.readValue(body, MovementSqsResponse.class);
             movementService.persistMovement(movement, false);
+
+            snsPublisherService.publishMovement(movement);
 
         } catch (BusinessValidationException ex) {
             log.warn("Business validation failed for messageId {}: {}", sqsMessage.getMessageId(), ex.getMessage());

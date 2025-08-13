@@ -8,21 +8,24 @@ import com.invest.exceptions.BusinessValidationException;
 import com.invest.models.OutputObject;
 import com.invest.models.responses.MovementSqsResponse;
 import com.invest.services.MovementService;
+import com.invest.services.SnsPublisherService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
 @Named("lbd-register-data-retry")
+@RequiredArgsConstructor
 public class RetryLambda implements RequestHandler<SQSEvent, OutputObject> {
 
     @Inject
     ObjectMapper objectMapper;
 
-    @Inject
-    MovementService movementService;
+    private final MovementService movementService;
+    private final SnsPublisherService snsPublisherService;
 
     @Override
     public OutputObject handleRequest(SQSEvent sqsEvent, Context context) {
@@ -40,6 +43,8 @@ public class RetryLambda implements RequestHandler<SQSEvent, OutputObject> {
         try {
             MovementSqsResponse movement = objectMapper.readValue(body, MovementSqsResponse.class);
             movementService.persistMovement(movement, true);
+
+            snsPublisherService.publishMovement(movement);
 
         } catch (BusinessValidationException ex) {
             log.warn("Retry validation failed, saving to error table. MessageId {}: {}", sqsMessage.getMessageId(), ex.getMessage());
