@@ -2,7 +2,11 @@
 
 ## Desenho da arquitetura
 
-![img.png](img.png)
+![arquitetura.png](src%2Fmain%2Fresources%2Fimages%2Farquitetura.png)
+
+## Diagrama das tabelas
+
+![diagrama-tabelas.png](src%2Fmain%2Fresources%2Fimages%2Fdiagrama-tabelas.png)
 
 * Inicialmente rodamos o MS com SpringBoot e WebFlux para criarmos as filas populas com os bodies (Json) ficticios do response esperado pela Lambda 
 * Após executar o MS, rodar o script com a porta e o endpoint para o webflux criar os dados e inserir na fila:
@@ -35,7 +39,7 @@ curl http://localhost:8080/movement/send
 * Faz as validações
 * Salva no banco a entidade Movimentação com endereço
 
-![img_2.png](img_2.png)
+![img_2.png](src%2Fmain%2Fresources%2Fimages%2Fimg_2.png)
 
 * Atualiza o status para PROCESSADO
 * Faz as validações
@@ -46,7 +50,7 @@ curl http://localhost:8080/movement/send
 * Em caso de sucesso salva a Movimentação no banco
 * Em caso de erro salvamos o erro no banco
 
-![img_1.png](img_1.png)
+![img_1.png](src%2Fmain%2Fresources%2Fimages%2Fimg_1.png)![img_1.png](img_1.png)
 
 
 ## Validações 
