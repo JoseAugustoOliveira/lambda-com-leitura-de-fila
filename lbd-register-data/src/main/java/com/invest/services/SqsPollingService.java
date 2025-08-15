@@ -51,7 +51,7 @@ public class SqsPollingService {
                 // movementService.persistMovement(movement, true);
 
                 sqsClient.deleteMessage(d -> d.queueUrl(queueUrl).receiptHandle(msg.receiptHandle()));
-            } catch (BusinessValidationException | JsonProcessingException ex) {
+            } catch (BusinessValidationException ex) {
                 movementService.saveError(msg.body(), ex);
                 sqsClient.deleteMessage(d -> d.queueUrl(queueUrl).receiptHandle(msg.receiptHandle()));
             }

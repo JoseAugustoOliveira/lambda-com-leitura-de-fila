@@ -17,9 +17,3 @@ services:
     volumes:
       - "./localstack:/etc/localstack/init/ready.d"
       - "/var/run/docker.sock:/var/run/docker.sock"
-
-networks:
-  default:
-    ipam:
-      config:
-        - subnet: 172.31.0.0/16

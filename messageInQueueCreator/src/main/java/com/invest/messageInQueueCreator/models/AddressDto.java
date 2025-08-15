@@ -6,6 +6,8 @@ import lombok.Builder;
 public record AddressDto(
         String street,
         String number,
+        String complement,
         String city,
+        String postalCode,
         String state,
         String neighbourhood) {}

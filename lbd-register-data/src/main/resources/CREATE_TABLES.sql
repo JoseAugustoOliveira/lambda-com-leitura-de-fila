@@ -48,3 +48,11 @@ CREATE INDEX IF NOT EXISTS idx_movimento_nu_cpf
 
 CREATE INDEX IF NOT EXISTS idx_erro_nu_cpf
     ON invest.tb_movimentacao_erro (nu_cpf);
+
+
+    -- criação de novas colunas
+ALTER TABLE INVEST.TB_ENDERECO
+ADD COLUMN COMPLEMENTO VARCHAR(50);
+
+ALTER TABLE INVEST.TB_ENDERECO
+ADD COLUMN CD_POSTAL VARCHAR(8);

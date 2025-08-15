@@ -1,7 +1,7 @@
 package com.invest.components;
 
 import com.invest.components.mappers.MovementValidator;
-import com.invest.exceptions.BusinessValidationException;
+import com.invest.models.ValidationErrorDto;
 import com.invest.models.responses.MovementSqsResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
@@ -22,10 +22,9 @@ public class ValidatorMovementComponent {
     private final AtomicInteger totalErrorMessages = new AtomicInteger();
 
     public void validateMovement(MovementSqsResponse movement) {
-        List<String> errors = validators.stream()
+        List<ValidationErrorDto> errors = validators.stream()
                 .map(v -> v.validate(movement))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .toList();
 
         if (!errors.isEmpty()) {
@@ -34,8 +33,6 @@ public class ValidatorMovementComponent {
 
             log.warn("This Movement had {} validation errors. Total validation errors so far: {}",
                     errorsInThisMovement, currentTotalErrors);
-
-            throw new BusinessValidationException("ValidationErrors", String.join("; ", errors));
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.invest.components.mappers.validators;
 
 import com.invest.components.mappers.MovementValidator;
+import com.invest.models.ValidationErrorDto;
 import com.invest.models.responses.MovementSqsResponse;
 import com.invest.repositories.MovementRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -17,9 +18,9 @@ public class DuplicateCpfValidator implements MovementValidator {
     MovementRepository movementRepository;
 
     @Override
-    public Optional<String> validate(MovementSqsResponse movement) {
+    public Optional<ValidationErrorDto> validate(MovementSqsResponse movement) {
         if (movementRepository.existsByDocumentNumber(movement.documentNumber())) {
-            return Optional.of(DUPLICATE_CPF);
+            return Optional.of(new ValidationErrorDto("CPF", DUPLICATE_CPF));
         }
         return Optional.empty();
     }

@@ -1,4 +1,4 @@
-package com.invest.entities;
+package com.invest.messageInQueueCreator.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,12 +38,12 @@ public class Address implements Serializable {
     @Column(name = "ESTADO")
     private String state;
 
-    @Column(name = "BAIRRO")
-    private String neighbourhood;
-
     @Column(name = "CD_POSTAL")
     private String postalCode;
 
     @Column(name = "COMPLEMENTO")
     private String complement;
+
+    @Column(name = "BAIRRO")
+    private String neighbourhood;
 }

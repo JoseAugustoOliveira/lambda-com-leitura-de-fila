@@ -2,8 +2,8 @@ package com.invest.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.invest.builders.MovementBuilder;
 import com.invest.components.ValidatorMovementComponent;
-import com.invest.entities.Address;
 import com.invest.entities.Movement;
 import com.invest.entities.MovementError;
 import com.invest.exceptions.BusinessValidationException;
@@ -19,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
-
-import java.util.UUID;
 
 @Slf4j
 @ApplicationScoped
@@ -46,7 +44,7 @@ public class MovementService {
 
             validatorMovementComponent.validateMovement(movementResponse);
 
-            var movement = buildMovement(movementResponse);
+            Movement movement = MovementBuilder.movementBuild(movementResponse);
             movementRepository.persist(movement);
 
             movement.setMovementStatus(MovementStatus.PROCESSED);
@@ -56,10 +54,11 @@ public class MovementService {
 
         } catch (BusinessValidationException ex) {
             if (!fromRetry) {
+                log.warn("Validation failed for Id {}. Sending to retry queue: {}", movementResponse.idMovement(), ex.getMessage());
                 sendToRetryQueue(movementResponse);
+            } else {
+                log.warn("Validation failed for Id {} from retry queue: {}", movementResponse.idMovement(), ex.getMessage());
             }
-            log.warn("Validation failed for Id {}: {}", movementResponse.idMovement(), ex.getMessage());
-            throw ex;
         }
     }
 
@@ -106,26 +105,5 @@ public class MovementService {
         } catch (Exception e) {
             log.error("Failed to send raw message to retry queue", e);
         }
-    }
-
-    private Movement buildMovement(MovementSqsResponse sqsResponse) {
-        return Movement.builder()
-                .idMovement(UUID.fromString(sqsResponse.idMovement()))
-                .name(sqsResponse.name())
-                .email(sqsResponse.email())
-                .description(sqsResponse.description())
-                .documentNumber(sqsResponse.documentNumber())
-                .creationTime(sqsResponse.creationTime())
-                .amount(sqsResponse.amount())
-                .movementStatus(MovementStatus.RECEIVED)
-                .expectedDeliveryDate(sqsResponse.expectedDeliveryDate())
-                .address(Address.builder()
-                        .street(sqsResponse.address().street())
-                        .number(sqsResponse.address().number())
-                        .city(sqsResponse.address().city())
-                        .state(sqsResponse.address().state())
-                        .neighbourhood(sqsResponse.address().neighbourhood())
-                        .build())
-                .build();
     }
 }
