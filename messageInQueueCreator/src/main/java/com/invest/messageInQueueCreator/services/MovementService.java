@@ -8,7 +8,6 @@ import com.invest.messageInQueueCreator.models.requests.AddressUpdateRequest;
 import com.invest.messageInQueueCreator.models.requests.MovementUpdateRequest;
 import com.invest.messageInQueueCreator.models.responses.MovementResponse;
 import com.invest.messageInQueueCreator.models.responses.PaginationResponse;
-import com.invest.messageInQueueCreator.repositories.AddressRepository;
 import com.invest.messageInQueueCreator.repositories.MovementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,6 @@ public class MovementService {
 
     private final Random random = new Random();
 
-    private final AddressRepository addressRepository;
     private final MovementRepository movementRepository;
 
     public Flux<MovementResponse> generateMovements() {

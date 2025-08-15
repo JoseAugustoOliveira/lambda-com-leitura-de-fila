@@ -20,6 +20,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
+import java.util.Optional;
+
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -67,6 +69,13 @@ public class MovementService {
         try {
             MovementSqsResponse dto = objectMapper.readValue(rawJson, MovementSqsResponse.class);
             String documentNumber = dto.documentNumber();
+
+            Optional<Movement> movementOpt = movementRepository.getMovementByDocumentNumber(documentNumber);
+
+            movementOpt.ifPresent(movement -> {
+                movement.setMovementStatus(MovementStatus.ERROR);
+                movementRepository.persist(movement);
+            });
 
             MovementError error = MovementError.builder()
                     .documentNumber(documentNumber)

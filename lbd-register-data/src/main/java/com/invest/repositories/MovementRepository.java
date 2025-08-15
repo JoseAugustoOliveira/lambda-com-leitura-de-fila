@@ -4,6 +4,7 @@ import com.invest.entities.Movement;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -16,4 +17,9 @@ public class MovementRepository implements PanacheRepository<Movement> {
     public boolean existsByIdMovement(UUID idMovement) {
         return find("idMovement", idMovement).firstResultOptional().isPresent();
     }
+
+    public Optional<Movement> getMovementByDocumentNumber(String documentNumber) {
+        return find("documentNumber", documentNumber).firstResultOptional();
+    }
+
 }
